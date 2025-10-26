@@ -6,30 +6,41 @@
 <title>Admin Dashboard</title>
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="p-6 bg-gray-100">
-<h1 class="text-2xl font-bold mb-4">Admin Dashboard</h1>
-<h2 class="font-semibold mt-4">Add Volunteer</h2>
+<body class="bg-gray-100 p-6">
+<h1 class="text-3xl font-bold mb-6">Admin Dashboard</h1>
+
+<h2 class="font-semibold mb-2">Add Volunteer</h2>
 <form id="addVolunteer" class="mb-4 space-y-2">
-<input type="text" placeholder="Name" id="vName" class="border p-2 rounded w-full">
-<input type="email" placeholder="Email" id="vEmail" class="border p-2 rounded w-full">
-<button type="submit" class="bg-green-600 text-white py-1 px-4 rounded">Add Volunteer</button>
+<input type="text" id="vName" placeholder="Name" class="w-full border p-2 rounded" required>
+<input type="email" id="vEmail" placeholder="Email" class="w-full border p-2 rounded" required>
+<button type="submit" class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition">Add Volunteer</button>
 </form>
-<h2 class="font-semibold mt-4">Create Event</h2>
+
+<h2 class="font-semibold mb-2">Create Event</h2>
 <form id="addEvent" class="mb-4 space-y-2">
-<input type="text" placeholder="Title" id="eTitle" class="border p-2 rounded w-full">
-<input type="date" id="eDate" class="border p-2 rounded w-full">
-<button type="submit" class="bg-blue-600 text-white py-1 px-4 rounded">Create Event</button>
+<input type="text" id="eTitle" placeholder="Title" class="w-full border p-2 rounded" required>
+<input type="date" id="eDate" class="w-full border p-2 rounded" required>
+<button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition">Create Event</button>
 </form>
+
 <script>
-document.getElementById('addVolunteer').addEventListener('submit', async e=>{
-    e.preventDefault();
-    await fetch('/add-volunteers',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:document.getElementById('vName').value,email:document.getElementById('vEmail').value})});
-    alert('Volunteer added!');
+document.getElementById('addVolunteer').addEventListener('submit', async e => {
+  e.preventDefault();
+  await fetch('/add-volunteers', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: document.getElementById('vName').value, email: document.getElementById('vEmail').value })
+  });
+  alert('Volunteer added!');
 });
-document.getElementById('addEvent').addEventListener('submit', async e=>{
-    e.preventDefault();
-    await fetch('/add-event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:document.getElementById('eTitle').value,date:document.getElementById('eDate').value})});
-    alert('Event created!');
+document.getElementById('addEvent').addEventListener('submit', async e => {
+  e.preventDefault();
+  await fetch('/add-event', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title: document.getElementById('eTitle').value, date: document.getElementById('eDate').value })
+  });
+  alert('Event created!');
 });
 </script>
 </body>
