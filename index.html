@@ -3,28 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Queen of Peace Volunteer Login</title>
+<title>Queen of Peace Login</title>
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="flex items-center justify-center min-h-screen bg-gray-100">
-<div class="w-full max-w-sm bg-white p-6 rounded-lg shadow-lg">
-<h1 class="text-2xl font-bold text-center mb-4">Volunteer Portal Login</h1>
+<body class="bg-gradient-to-br from-purple-400 to-indigo-600 flex items-center justify-center min-h-screen">
+<div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-sm">
+<h1 class="text-3xl font-bold text-center mb-4 text-gray-800">Volunteer Login</h1>
 <form id="loginForm" class="space-y-4">
-<input type="text" placeholder="Username" id="username" class="w-full p-2 border rounded">
-<input type="password" placeholder="Password" id="password" class="w-full p-2 border rounded">
-<button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded">Login</button>
+<input type="text" id="username" placeholder="Username" class="w-full border p-2 rounded" required>
+<input type="password" id="password" placeholder="Password" class="w-full border p-2 rounded" required>
+<button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition">Login</button>
 </form>
-<div id="feedback" class="mt-2 text-center text-red-600"></div>
+<div id="feedback" class="mt-2 text-red-600 text-center"></div>
 </div>
 <script>
 const form = document.getElementById('loginForm');
 const feedback = document.getElementById('feedback');
 form.addEventListener('submit', async e => {
-    e.preventDefault();
-    const res = await fetch('/login', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:document.getElementById('username').value,password:document.getElementById('password').value})});
-    const data = await res.json();
-    if(data.success) window.location.href = data.redirect;
-    else feedback.innerText = data.message;
+  e.preventDefault();
+  const res = await fetch('/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      username: document.getElementById('username').value,
+      password: document.getElementById('password').value
+    })
+  });
+  const data = await res.json();
+  if(data.success) window.location.href = data.redirect;
+  else feedback.innerText = data.message;
 });
 </script>
 </body>
