@@ -1,0 +1,127 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin - Queen of Peace</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gray-50 p-6">
+  <div class="max-w-5xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold text-indigo-700">Admin Dashboard</h1>
+      <div>
+        <button id="logoutBtn" class="px-3 py-1 bg-red-500 text-white rounded">Logout</button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="bg-white p-4 rounded shadow">
+        <h2 class="font-semibold mb-2">Add Volunteer</h2>
+        <form id="addVolForm" class="space-y-2">
+          <input id="vfirst" placeholder="First name" class="w-full border rounded px-2 py-1" />
+          <input id="vlast" placeholder="Last name" class="w-full border rounded px-2 py-1" />
+          <input id="vemail" placeholder="Email" class="w-full border rounded px-2 py-1" />
+          <button class="bg-indigo-600 text-white px-3 py-1 rounded">Add</button>
+        </form>
+      </div>
+
+      <div class="bg-white p-4 rounded shadow">
+        <h2 class="font-semibold mb-2">Bulk upload (CSV)</h2>
+        <p class="text-xs text-gray-500 mb-2">CSV format: firstName,lastName,email (one per line)</p>
+        <form id="bulkForm">
+          <input type="file" id="csvfile" accept=".csv" />
+          <button class="mt-2 bg-indigo-600 text-white px-3 py-1 rounded">Upload</button>
+        </form>
+      </div>
+
+      <div class="bg-white p-4 rounded shadow">
+        <h2 class="font-semibold mb-2">Create Event</h2>
+        <form id="createEventForm" class="space-y-2">
+          <input id="etitle" placeholder="Title" class="w-full border rounded px-2 py-1" />
+          <input id="edate" type="date" class="w-full border rounded px-2 py-1" />
+          <input id="eloc" placeholder="Location" class="w-full border rounded px-2 py-1" />
+          <input id="ecap" type="number" placeholder="Capacity (0 for unlimited)" class="w-full border rounded px-2 py-1" />
+          <button class="bg-green-600 text-white px-3 py-1 rounded">Create</button>
+        </form>
+      </div>
+
+      <div class="bg-white p-4 rounded shadow">
+        <h2 class="font-semibold mb-2">Events & Hours</h2>
+        <div id="eventsList" class="space-y-2"></div>
+        <h3 class="mt-4 font-semibold">All hours</h3>
+        <pre id="hoursPre" class="text-xs bg-gray-100 p-2 rounded max-h-48 overflow-auto"></pre>
+      </div>
+    </div>
+  </div>
+
+<script>
+async function fetchEvents(){
+  const r = await fetch('/api/events');
+  const events = await r.json();
+  const container = document.getElementById('eventsList');
+  container.innerHTML = '';
+  for (const e of events){
+    const div = document.createElement('div');
+    div.className = 'p-2 border rounded';
+    div.innerHTML = `<strong>${e.title}</strong> <div class="text-xs text-gray-600">${e.date} · ${e.location} · ${e.attendees.length || 0} registered</div>`;
+    container.appendChild(div);
+  }
+}
+
+async function fetchHours(){
+  const r = await fetch('/api/hours');
+  if (!r.ok) return;
+  const hrs = await r.json();
+  document.getElementById('hoursPre').textContent = JSON.stringify(hrs, null, 2);
+}
+
+document.getElementById('addVolForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const firstName = document.getElementById('vfirst').value;
+  const lastName = document.getElementById('vlast').value;
+  const email = document.getElementById('vemail').value;
+  const res = await fetch('/api/volunteers', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ firstName, lastName, email })
+  });
+  if (res.ok) { alert('Added'); document.getElementById('vfirst').value=''; document.getElementById('vlast').value=''; document.getElementById('vemail').value=''; }
+});
+
+document.getElementById('bulkForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = document.getElementById('csvfile').files[0];
+  if (!f) return alert('Select file');
+  const fd = new FormData();
+  fd.append('file', f);
+  const res = await fetch('/api/volunteers/bulk', { method: 'POST', body: fd });
+  if (res.ok){ const j = await res.json(); alert('Added ' + j.added.length + ' volunteers'); }
+  else alert('Upload failed');
+});
+
+document.getElementById('createEventForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const title = document.getElementById('etitle').value;
+  const date = document.getElementById('edate').value;
+  const location = document.getElementById('eloc').value;
+  const capacity = document.getElementById('ecap').value;
+  const res = await fetch('/api/events', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ title, date, location, capacity })
+  });
+  if (res.ok){ alert('Event created'); fetchEvents(); }
+  else alert('Failed');
+});
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  await fetch('/api/logout', { method: 'POST' });
+  window.location.href = '/';
+});
+
+fetchEvents();
+fetchHours();
+</script>
+</body>
+</html>

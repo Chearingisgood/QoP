@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Queen of Peace - Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen flex items-center justify-center bg-gray-100">
+  <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+    <h1 class="text-2xl font-bold mb-4 text-indigo-700">Queen of Peace Volunteer Portal</h1>
+
+    <form id="loginForm" class="space-y-4">
+      <div>
+        <label class="block text-sm">Username</label>
+        <input id="username" class="w-full border rounded px-3 py-2" required />
+      </div>
+      <div>
+        <label class="block text-sm">Password</label>
+        <input id="password" type="password" class="w-full border rounded px-3 py-2" required />
+      </div>
+      <div>
+        <button class="w-full bg-indigo-600 text-white py-2 rounded" type="submit">Sign In</button>
+      </div>
+    </form>
+
+    <p class="mt-4 text-sm text-gray-600">Admin: <strong>bryandaw</strong> / <strong>bryandaw</strong></p>
+    <p class="mt-2 text-sm text-gray-600">Or visit <a href="/dashboard.html" class="text-indigo-600">Volunteer Dashboard</a></p>
+  </div>
+
+<script>
+const form = document.getElementById('loginForm');
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+  const res = await fetch('/api/login', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ username, password })
+  });
+  if (res.ok) {
+    window.location.href = '/admin.html';
+  } else {
+    alert('Login failed');
+  }
+});
+</script>
+</body>
+</html>
