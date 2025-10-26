@@ -7,47 +7,38 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware setup
+// Middleware
 app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(session({
+  secret: 'queenofpeace_secret_key',
+  resave: false,
+  saveUninitialized: true
+}));
 
-app.use(
-  session({
-    secret: 'queenofpeace_secret_key',
-    resave: false,
-    saveUninitialized: true,
-  })
-);
+// First admin
+const ADMIN_USER = 'fbffc64';
+const ADMIN_PASS = 'fbffc64';
 
-// Admin credentials
-const ADMIN_USER = 'bryandaw';
-const ADMIN_PASS = 'bryandaw';
-
-// Ensure data folder and files exist
+// Ensure data folder exists
 const dataDir = path.join(__dirname, 'data');
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
-  console.log('📁 Created /data directory');
-}
+if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 
 const volunteersFile = path.join(dataDir, 'volunteers.json');
 const eventsFile = path.join(dataDir, 'events.json');
 
-// Helper to ensure files exist
+// Ensure JSON files exist
 function ensureFile(filePath) {
   if (!fs.existsSync(filePath)) {
     fs.writeFileSync(filePath, '[]');
-    console.log(`📝 Created ${path.basename(filePath)}`);
+    console.log(`Created ${path.basename(filePath)}`);
   }
 }
-
 ensureFile(volunteersFile);
 ensureFile(eventsFile);
 
-// --- ROUTES ---
-
-// Login route
+// Routes
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
   if (username === ADMIN_USER && password === ADMIN_PASS) {
@@ -58,17 +49,13 @@ app.post('/login', (req, res) => {
   }
 });
 
-// Logout route
 app.get('/logout', (req, res) => {
   req.session.destroy();
   res.redirect('/');
 });
 
-// Add volunteers (placeholder route)
 app.post('/add-volunteers', (req, res) => {
-  if (!req.session.user)
-    return res.status(403).json({ error: 'Unauthorized' });
-
+  if (!req.session.user) return res.status(403).json({ error: 'Unauthorized' });
   let volunteers = JSON.parse(fs.readFileSync(volunteersFile));
   const { name, email } = req.body;
   volunteers.push({ name, email });
@@ -76,11 +63,8 @@ app.post('/add-volunteers', (req, res) => {
   res.json({ success: true });
 });
 
-// Add events (placeholder route)
 app.post('/add-event', (req, res) => {
-  if (!req.session.user)
-    return res.status(403).json({ error: 'Unauthorized' });
-
+  if (!req.session.user) return res.status(403).json({ error: 'Unauthorized' });
   let events = JSON.parse(fs.readFileSync(eventsFile));
   const { title, date } = req.body;
   events.push({ title, date });
@@ -88,12 +72,9 @@ app.post('/add-event', (req, res) => {
   res.json({ success: true });
 });
 
-// Default route
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`✅ Queen of Peace app listening on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Queen of Peace app listening on port ${PORT}`));
