@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-6 bg-gray-100">
+<h1 class="text-2xl font-bold mb-4">Admin Dashboard</h1>
+<h2 class="font-semibold mt-4">Add Volunteer</h2>
+<form id="addVolunteer" class="mb-4 space-y-2">
+<input type="text" placeholder="Name" id="vName" class="border p-2 rounded w-full">
+<input type="email" placeholder="Email" id="vEmail" class="border p-2 rounded w-full">
+<button type="submit" class="bg-green-600 text-white py-1 px-4 rounded">Add Volunteer</button>
+</form>
+<h2 class="font-semibold mt-4">Create Event</h2>
+<form id="addEvent" class="mb-4 space-y-2">
+<input type="text" placeholder="Title" id="eTitle" class="border p-2 rounded w-full">
+<input type="date" id="eDate" class="border p-2 rounded w-full">
+<button type="submit" class="bg-blue-600 text-white py-1 px-4 rounded">Create Event</button>
+</form>
+<script>
+document.getElementById('addVolunteer').addEventListener('submit', async e=>{
+    e.preventDefault();
+    await fetch('/add-volunteers',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:document.getElementById('vName').value,email:document.getElementById('vEmail').value})});
+    alert('Volunteer added!');
+});
+document.getElementById('addEvent').addEventListener('submit', async e=>{
+    e.preventDefault();
+    await fetch('/add-event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:document.getElementById('eTitle').value,date:document.getElementById('eDate').value})});
+    alert('Event created!');
+});
+</script>
+</body>
+</html>
